@@ -21,10 +21,7 @@ const LoginCard = (): JSX.Element => {
 
     const login = async () => {
         try {
-            _login(identity.username, identity.password)
-                .then(response => {
-                    console.log('Login: ', response);
-                })
+            _login(identity.username, identity.password);
         } catch (error) {
             console.log(error);
         } 
