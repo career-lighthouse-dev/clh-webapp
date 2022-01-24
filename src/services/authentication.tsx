@@ -1,4 +1,5 @@
 import { get, post, put } from './uacAxios';
+import {RegisterForm} from '../models/RegisterForm';
 
 export const _login = (username: string, password: string) => {
     console.log("Login input: username - " + username + ", password - " + password);
@@ -16,4 +17,8 @@ export const _login = (username: string, password: string) => {
 
 export const _isLogin = () => {
     return post<Response>(`/uac/isLogin`);
+}
+
+export const _register = (form:RegisterForm) => {
+    return post<Response>(`/uac/register`, form);
 }

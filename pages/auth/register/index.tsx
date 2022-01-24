@@ -1,9 +1,10 @@
+import Register from "../../../src/views/Register"
 
 const RegisterPage = (): JSX.Element => {
     
     return (
         <div>
-            Test
+            <Register/>
         </div>
     )
 };
