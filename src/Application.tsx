@@ -44,7 +44,6 @@ export const useDarkMode = () => {
 };
 
 interface Props {
-  layout: any;
   component: any;
   // All other props
   [x: string]: any;
@@ -57,7 +56,6 @@ interface Props {
  */
 export default function Application({
   component: Component,
-  layout: Layout,
   ...rest
 }: Props): JSX.Element {
 
@@ -95,9 +93,9 @@ export default function Application({
         }}
         maxSnack={3}>
           <Paper elevation={0}>
-            <Layout themeMode={themeMode} themeToggler={themeToggler}>
+            {/* <Layout themeMode={themeMode} themeToggler={themeToggler}> */}
               <Component themeMode={themeMode} {...rest} />
-            </Layout>
+            {/* </Layout> */}
           </Paper>
         </SnackbarProvider>
       </ThemeProvider>

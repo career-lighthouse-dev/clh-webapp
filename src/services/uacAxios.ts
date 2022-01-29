@@ -22,9 +22,9 @@ service.interceptors.response.use(
         console.log("Response of API call: ", response);
         if (response.status === 200) {
             return response.data;
+        } else {
+            throw new response.data;
         }
-
-        return response;
     },
     (error) => {
         console.log(error);

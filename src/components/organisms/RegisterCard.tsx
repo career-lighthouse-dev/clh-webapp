@@ -1,17 +1,24 @@
-import React, { useState } from 'react';
-import { Card, TextField, Button } from "@material-ui/core";
+import React, { useState, useCallback } from 'react';
+import { Card, TextField, Button, CardActions, CardContent } from "@material-ui/core";
 import { _register } from '../../services/authentication';
 import { RegisterForm } from '../../models/RegisterForm';
+import LoadingButton from '@mui/lab/LoadingButton';
+import { useRouter } from 'next/router';
+import { useSnackbar, VariantType } from 'notistack';
+import { ErrorMessage } from '../../exception/ErrorMessage';
 
 const RegisterCard = (): JSX.Element => {
 
+    const router = useRouter();
+
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const { enqueueSnackbar } = useSnackbar();
+
     const [registerForm, setForm] = useState<RegisterForm>({
         username: '',
-
         email: '',
-
         password: '',
-
         confirmedPassword: '',
     });
 
@@ -22,50 +29,87 @@ const RegisterCard = (): JSX.Element => {
         }));
     };
 
+    const addNotification = useCallback(
+        (variant: VariantType, message: string) => {
+          enqueueSnackbar(message, { variant });
+        },
+        [enqueueSnackbar],
+      );
+
+    /**
+     * Register
+     */
     const register = async () => {
-        try {
-        _register(registerForm);
-        } catch(e) {
-            //throw
-        }
+        setLoading(true)
+        _register(registerForm)
+        .then(response => {
+            if (response) {
+                router.push(`/auth/login`);
+            } else {
+                addNotification('error', ErrorMessage.FAILED_REGISTER);
+            }
+        })
+        .catch(error => {
+            console.log(error);
+            addNotification('error', error);
+        })
+        .finally(() => setLoading(false));
     }
 
     return (
-        <Card>
-            <TextField
-            required
-            name='email'
-            label='Email'
-            onChange={handleChange}
-            value={registerForm.email}
-            />
-
-            <TextField
-            required
-            name='username'
-            label='User Name'
-            onChange={handleChange}
-            value={registerForm.username}
-            />
-
-            <TextField
-            required
-            name='password'
-            label='Password'
-            onChange={handleChange}
-            value={registerForm.password}
-            />
-
-            <TextField
-            required
-            name='confirmedPassword'
-            label='Confirmed Password'
-            onChange={handleChange}
-            value={registerForm.confirmedPassword}
-            />
-
-            <Button variant="contained" onClick={register}>Register</Button>
-        </Card>
+        <div>
+            <Card style={{ minWidth: 400, maxWidth: 500, padding: 30 }}>
+                <CardContent>
+                    <div>
+                        <TextField
+                            label='Email'
+                            name='email'
+                            value={registerForm.email}
+                            onChange={handleChange}
+                            variant='filled'
+                            fullWidth
+                            style={{marginBottom: 20}}
+                        />
+                    </div>
+                    <div>
+                        <TextField
+                            label='User Name'
+                            name='username'
+                            value={registerForm.username}
+                            onChange={handleChange}
+                            variant='filled'
+                            fullWidth
+                            style={{marginBottom: 20}}
+                        />
+                    </div>
+                    <div>
+                        <TextField
+                            label='Password'
+                            name='password'
+                            value={registerForm.password}
+                            onChange={handleChange}
+                            variant='filled'
+                            fullWidth
+                            style={{marginBottom: 20}}
+                        />
+                    </div>
+                    <div>
+                        <TextField
+                            label='Confirmed Password'
+                            name='confirmedPassword'
+                            value={registerForm.confirmedPassword}
+                            onChange={handleChange}
+                            variant='filled'
+                            fullWidth
+                            style={{marginBottom: 20}}
+                        />
+                    </div>
+                </CardContent>
+                <CardActions>
+                    <LoadingButton loading={loading} variant="contained" color='primary' onClick={register}>Register</LoadingButton>
+                </CardActions>
+            </Card>
+        </div>
     )
 }
 
