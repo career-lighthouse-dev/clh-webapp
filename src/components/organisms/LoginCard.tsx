@@ -5,6 +5,24 @@ import { _isLogin, _login } from '../../services/authentication';
 import { useSnackbar,VariantType } from 'notistack';
 import {useRouter} from 'next/router';
 import { ErrorMessage } from '../../exception/ErrorMessage';
+import { LoginForm } from '../../models/LoginForm';
+import validate from 'validate.js';
+import { FormMessgae } from '../../exception/FormMessage';
+
+const LoginSchema = {
+    username: {
+        presence: {
+            allowEmpty: false,
+            message: FormMessgae.EMPTY
+        }
+    },
+    password: {
+        presence: {
+            allowEmpty: false,
+            message: FormMessgae.EMPTY
+        }
+    }
+}
 
 const LoginCard = (): JSX.Element => {
 
@@ -14,10 +32,9 @@ const LoginCard = (): JSX.Element => {
 
     const { enqueueSnackbar } = useSnackbar();
 
-    const [identity, setIdentity] = useState<{
-        username: string;
-        password: string;
-    }>({ username: '', password: '' });
+    const [identity, setIdentity] = useState<LoginForm>({ username: null, password: null});
+
+    const [loginErrors, setErrors] = useState<LoginForm>({ username: null, password: null});
 
     /**
      * Change form states
@@ -33,33 +50,40 @@ const LoginCard = (): JSX.Element => {
     );
 
 
-  const addNotification = useCallback(
-    (variant: VariantType, message: string) => {
-      enqueueSnackbar(message, { variant });
-    },
-    [enqueueSnackbar],
-  );
+    const addNotification = useCallback(
+        (variant: VariantType, message: string) => {
+        enqueueSnackbar(message, { variant });
+        },
+        [enqueueSnackbar],
+    );
 
     /**
      * Login
      */
     const login = async () => {
         setLoading(true);
-        _login(identity.username, identity.password)
-        .then((result:boolean) => {
-            if (result) {
-                //Redirect
-                router.push(`/board`);
-            } else {
-                //Print error
-                addNotification('error', ErrorMessage.FAILED_LOGIN);
-            }
-        })
-        .catch(error => {
-            console.log(error);
-            addNotification('error', ErrorMessage.WENT_WRONG);
-        })
-        .finally(() => setLoading(false));
+
+        let errors = await validate(identity, LoginSchema);
+
+        if (errors != void 0 && Object.keys(errors).length > 0) {
+            setErrors(errors);
+        } else {
+            _login(identity)
+            .then((result:boolean) => {
+                if (result) {
+                    //Redirect
+                    router.push(`/board`);
+                } else {
+                    //Print error
+                    addNotification('error', ErrorMessage.FAILED_LOGIN);
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                addNotification('error', ErrorMessage.WENT_WRONG);
+            })
+            .finally(() => setLoading(false));
+        }
     }
 
     return (

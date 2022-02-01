@@ -1,6 +1,6 @@
 export interface RegisterForm {
-    username: string;
-    email: string;
-    password: string;
-    confirmedPassword: string;
+    username: string | null;
+    email: string | null;
+    password: string | null;
+    confirmedPassword: string | null;
 }

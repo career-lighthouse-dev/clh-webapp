@@ -1,11 +1,11 @@
 import { get, post, put } from './uacAxios';
 import { RegisterForm } from '../models/RegisterForm';
+import { LoginForm } from '../models/LoginForm';
 
-export const _login = (username: string, password: string) => {
-    console.log("Login input: username - " + username + ", password - " + password);
+export const _login = (identity:LoginForm) => {
     return post<any>(`/uac/login`, {
-        username: username,
-        password: password
+        username: identity.username,
+        password: identity.password
     }).then((res: any) => {
         if (res != void 0) {
             localStorage.setItem('token', JSON.stringify(res));
